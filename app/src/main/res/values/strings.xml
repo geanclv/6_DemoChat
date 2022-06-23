@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Demo Chat</string>
+
+    <string name="lbl_user">Username</string>
+    <string name="lbl_pass">Password</string>
+    <string name="lbl_new_account">Do not have an account?</string>
+    <string name="btn_signin">Signin here</string>
+
     <string name="nav_header_title">Chat app demo</string>
     <string name="nav_header_subtitle">geancarlo@github.com</string>
     <string name="action_settings">Settings</string>
