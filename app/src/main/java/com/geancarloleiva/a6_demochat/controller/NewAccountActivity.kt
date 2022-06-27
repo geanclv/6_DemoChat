@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.*
 import com.geancarloleiva.a6_demochat.R
 import com.geancarloleiva.a6_demochat.service.AuthService
+import com.geancarloleiva.a6_demochat.util.Utils
 import java.util.*
 
 class NewAccountActivity : AppCompatActivity() {
@@ -35,7 +36,7 @@ class NewAccountActivity : AppCompatActivity() {
         }
 
         val btnBackground: Button = findViewById(R.id.btnBackground)
-        btnBackground.setOnClickListener{
+        btnBackground.setOnClickListener {
             val random = Random()
             val r = random.nextInt(255)
             val g = random.nextInt(255)
@@ -55,17 +56,29 @@ class NewAccountActivity : AppCompatActivity() {
         val txtName: EditText = findViewById(R.id.txtName)
         val txtEmail: EditText = findViewById(R.id.txtEmail)
         val txtPassword: EditText = findViewById(R.id.txtPassword)
-        btnCreate.setOnClickListener{
+        btnCreate.setOnClickListener {
             val name = txtName.text.toString()
             val email = txtEmail.text.toString()
             val password = txtPassword.text.toString()
 
-            AuthService.createUser(this, name, email, password) {complete ->
-                if(complete){
-                    Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show()
+            if (name.isNotBlank() && name.isNotEmpty()) {
+                if (email.isNotBlank() && email.isNotEmpty()) {
+                    if (password.isNotBlank() && password.isNotEmpty()) {
+                        AuthService.createUser(this, name, email, password) { complete ->
+                            if (complete) {
+                                Utils.showShortToast(this, "OK")
+                            } else {
+                                Utils.showShortToast(this, "ERROR")
+                            }
+                        }
+                    } else {
+                        Utils.showShortToast(this, "Password is required")
+                    }
                 } else {
-                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    Utils.showShortToast(this, "Email is required")
                 }
+            } else {
+                Utils.showShortToast(this, "Name is required")
             }
         }
     }
