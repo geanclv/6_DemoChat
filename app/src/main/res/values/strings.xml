@@ -7,7 +7,7 @@
     <string name="btn_signin">Signin here</string>
 
     <string name="lbl_create_user">Fill the information to create a new account</string>
-    <string name="lbl_username">Username</string>
+    <string name="lbl_user_name">Name</string>
     <string name="lbl_new_avatar">Tap to generate user avatar</string>
     <string name="btn_background">Generate background color</string>
     <string name="btn_create_user">Create user</string>

@@ -4,10 +4,9 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import com.geancarloleiva.a6_demochat.R
+import com.geancarloleiva.a6_demochat.service.AuthService
 import java.util.*
 
 class NewAccountActivity : AppCompatActivity() {
@@ -50,6 +49,24 @@ class NewAccountActivity : AppCompatActivity() {
             val savedB = b.toDouble() / 255
 
             defaultBackground = "[$savedR, $savedG, $savedB, 1]"
+        }
+
+        val btnCreate: Button = findViewById(R.id.btnCreate)
+        val txtName: EditText = findViewById(R.id.txtName)
+        val txtEmail: EditText = findViewById(R.id.txtEmail)
+        val txtPassword: EditText = findViewById(R.id.txtPassword)
+        btnCreate.setOnClickListener{
+            val name = txtName.text.toString()
+            val email = txtEmail.text.toString()
+            val password = txtPassword.text.toString()
+
+            AuthService.createUser(this, name, email, password) {complete ->
+                if(complete){
+                    Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }

@@ -7,14 +7,14 @@
     tools:context=".controller.NewAccountActivity">
 
     <EditText
-        android:id="@+id/txtUsername"
+        android:id="@+id/txtName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
-        android:hint="@string/lbl_username"
+        android:hint="@string/lbl_user_name"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
