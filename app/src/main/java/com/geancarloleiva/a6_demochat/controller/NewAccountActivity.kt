@@ -67,6 +67,8 @@ class NewAccountActivity : AppCompatActivity() {
                         AuthService.createUser(this, name, email, password) { complete ->
                             if (complete) {
                                 Utils.showShortToast(this, "OK")
+                                val loginIntent = Intent(this, LoginActivity::class.java)
+                                startActivity(loginIntent)
                             } else {
                                 Utils.showShortToast(this, "ERROR")
                             }
