@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import com.geancarloleiva.a6_demochat.R
 import com.geancarloleiva.a6_demochat.service.AuthService
@@ -13,12 +14,19 @@ import java.util.*
 
 class NewAccountActivity : AppCompatActivity() {
 
-    var userAvatar = "avatar_1"
-    var avatarColor = "[0.5, 0.5, 0.5, 1]"
+    private var userAvatar = "avatar_1"
+    private var avatarColor = "[0.5, 0.5, 0.5, 1]"
+    private val progressBarCreate: ProgressBar = findViewById(R.id.progressBarCreate)
+    private val iviAvatar: ImageView = findViewById(R.id.iviAvatar)
+    private val btnBackground: Button = findViewById(R.id.btnBackground)
+    private val btnCreate: Button = findViewById(R.id.btnCreate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_account)
+
+        //Hidden the progress bar
+        progressBarCreate.visibility = View.INVISIBLE
 
         //Go to login button
         val lblGoLogin: TextView = findViewById(R.id.lblGoLogin)
@@ -28,7 +36,6 @@ class NewAccountActivity : AppCompatActivity() {
         }
 
         //Giving avatar to user
-        val iviAvatar: ImageView = findViewById(R.id.iviAvatar)
         iviAvatar.setOnClickListener {
             val random = Random()
             val avatarNumber = random.nextInt(10)
@@ -39,7 +46,6 @@ class NewAccountActivity : AppCompatActivity() {
         }
 
         //Giving color background
-        val btnBackground: Button = findViewById(R.id.btnBackground)
         btnBackground.setOnClickListener {
             val random = Random()
             val r = random.nextInt(255)
@@ -57,39 +63,51 @@ class NewAccountActivity : AppCompatActivity() {
         }
 
         //Creating user
-        val btnCreate: Button = findViewById(R.id.btnCreate)
-        val txtName: EditText = findViewById(R.id.txtName)
-        val txtEmail: EditText = findViewById(R.id.txtEmail)
-        val txtPassword: EditText = findViewById(R.id.txtPassword)
         btnCreate.setOnClickListener {
-            val name = txtName.text.toString()
-            val email = txtEmail.text.toString()
-            val password = txtPassword.text.toString()
+            createUser()
+        }
+    }
 
-            if (name.isNotBlank() && name.isNotEmpty()) {
-                if (email.isNotBlank() && email.isNotEmpty()) {
-                    if (password.isNotBlank() && password.isNotEmpty()) {
-                        AuthService.createUser(this, name, email, password, userAvatar, avatarColor) { complete ->
-                            if (complete) {
-                                println(UserDataService.id)
-                                println(UserDataService.name)
-                                println(UserDataService.avatarName)
-                                Utils.showShortToast(this, "OK")
-                                val loginIntent = Intent(this, LoginActivity::class.java)
-                                startActivity(loginIntent)
-                            } else {
-                                Utils.showShortToast(this, "ERROR")
-                            }
+    private fun createUser(){
+        progressBarVisible(true)
+        val name = findViewById<EditText?>(R.id.txtName).text.toString()
+        val email = findViewById<EditText?>(R.id.txtEmail).text.toString()
+        val password = findViewById<EditText?>(R.id.txtPassword).text.toString()
+
+        if (name.isNotBlank() && name.isNotEmpty()) {
+            if (email.isNotBlank() && email.isNotEmpty()) {
+                if (password.isNotBlank() && password.isNotEmpty()) {
+                    AuthService.createUser(this, name, email, password, userAvatar, avatarColor) { complete ->
+                        if (complete) {
+                            Utils.showShortToast(this, "OK")
+                            //we could return to login by an Intent or finishing the activity where we are
+                            /*val loginIntent = Intent(this, LoginActivity::class.java)
+                            startActivity(loginIntent)*/
+                            finish()
+                        } else {
+                            Utils.showShortToast(this, "ERROR")
                         }
-                    } else {
-                        Utils.showShortToast(this, "Password is required")
                     }
                 } else {
-                    Utils.showShortToast(this, "Email is required")
+                    Utils.showShortToast(this, "Password is required")
                 }
             } else {
-                Utils.showShortToast(this, "Name is required")
+                Utils.showShortToast(this, "Email is required")
             }
+        } else {
+            Utils.showShortToast(this, "Name is required")
         }
+        progressBarVisible(false)
+    }
+
+    private fun progressBarVisible(enable: Boolean){
+        if(enable) {
+            progressBarCreate.visibility = View.VISIBLE
+        } else {
+            progressBarCreate.visibility = View.INVISIBLE
+        }
+        iviAvatar.isEnabled = !enable
+        btnBackground.isEnabled = !enable
+        btnCreate.isEnabled = !enable
     }
 }
