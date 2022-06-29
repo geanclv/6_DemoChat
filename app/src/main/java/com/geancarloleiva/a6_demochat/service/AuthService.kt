@@ -64,13 +64,13 @@ object AuthService {
         val createRequest = object : JsonObjectRequest(Request.Method.POST, url, null,
             Response.Listener { response ->
                 try {
-                    UserDataService.id = response.getString("id")
-                    UserDataService.name = response.getString("name")
-                    UserDataService.email = response.getString("email")
-                    UserDataService.avatarName = response.getString("avatarName")
-                    UserDataService.avatarColor = response.getString("avatarColor")
-                    complete(true)
-                } catch (e: Exception){
+                    println(response)
+                    if (response.getBoolean("completed")) {
+                        complete(true)
+                    } else {
+                        complete(false)
+                    }
+                } catch (e: Exception) {
                     Log.d("ERROR", "No creation: ${e.localizedMessage}")
                     complete(false)
                 }
@@ -107,10 +107,18 @@ object AuthService {
         val loginRequest = object : JsonObjectRequest(Method.POST, USER_LOGIN, null,
             Response.Listener { response ->
                 try {
-                    authToken = response.getString("token")
-                    userEmail = response.getString("email")
-                    isLoggedIn = true
-                    complete(true)
+                    if(response.getBoolean("completed")) {
+                        authToken = "fakeToken"
+                        UserDataService.id = response.getString("id")
+                        UserDataService.name = response.getString("name")
+                        UserDataService.email = response.getString("email")
+                        UserDataService.avatarName = response.getString("avatarName")
+                        UserDataService.avatarColor = response.getString("avatarColor")
+                        isLoggedIn = true
+                        complete(true)
+                    } else {
+                        complete(false)
+                    }
                 } catch (e: Exception) {
                     Log.d("ERROR", e.localizedMessage)
                     complete(false)

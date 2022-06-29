@@ -41,6 +41,9 @@ class LoginActivity : AppCompatActivity() {
                             //Broadcasting that the user is Logged in
                             val userDataChange = Intent(BROADCAST_USER_DATA_CHANGE)
                             LocalBroadcastManager.getInstance(this).sendBroadcast(userDataChange)
+                            finish()
+                        } else {
+                            Utils.showShortToast(this, "Invalid user or password")
                         }
                     }
                 } else{

@@ -30,10 +30,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     //My code
-    private val iviAvatar: ImageView = findViewById(R.id.iviAvatar)
-    private val txtName: TextView = findViewById(R.id.txtName)
-    private val txtEmail: TextView = findViewById(R.id.txtEmail)
-    private val btnLogin: Button = findViewById(R.id.btnLogin)
+    private lateinit var iviAvatar: ImageView
+    private lateinit var txtName: TextView
+    private lateinit var txtEmail: TextView
+    private lateinit var btnLogin: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,13 +57,18 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //My code
+        iviAvatar = findViewById(R.id.iviAvatar)
+        txtName = findViewById(R.id.txtName)
+        txtEmail = findViewById(R.id.txtEmail)
+        btnLogin = findViewById(R.id.btnLogin)
+
         //Go to login
         btnLogin.setOnClickListener {
             if (AuthService.isLoggedIn) {
                 UserDataService.logout()
-                btnLogin.text = R.string.btn_login.toString()
-                txtName.text = R.string.nav_header_title.toString()
-                txtEmail.text = R.string.nav_header_subtitle.toString()
+                btnLogin.text = getString(R.string.btn_login)
+                txtName.text = getString(R.string.nav_header_title)
+                txtEmail.text = getString(R.string.nav_header_subtitle)
                 iviAvatar.setImageResource(R.mipmap.ic_launcher_round)
                 iviAvatar.setBackgroundColor(Color.TRANSPARENT)
             } else {

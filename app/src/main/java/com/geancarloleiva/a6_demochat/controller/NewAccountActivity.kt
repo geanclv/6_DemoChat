@@ -16,14 +16,19 @@ class NewAccountActivity : AppCompatActivity() {
 
     private var userAvatar = "avatar_1"
     private var avatarColor = "[0.5, 0.5, 0.5, 1]"
-    private val progressBarCreate: ProgressBar = findViewById(R.id.progressBarCreate)
-    private val iviAvatar: ImageView = findViewById(R.id.iviAvatar)
-    private val btnBackground: Button = findViewById(R.id.btnBackground)
-    private val btnCreate: Button = findViewById(R.id.btnCreate)
+    private lateinit var progressBarCreate: ProgressBar
+    private lateinit var iviAvatar: ImageView
+    private lateinit var btnBackground: Button
+    private lateinit var btnCreate: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_account)
+
+        progressBarCreate = findViewById(R.id.progressBarCreate)
+        iviAvatar = findViewById(R.id.iviAvatar)
+        btnBackground = findViewById(R.id.btnBackground)
+        btnCreate = findViewById(R.id.btnCreate)
 
         //Hidden the progress bar
         progressBarCreate.visibility = View.INVISIBLE
@@ -38,7 +43,7 @@ class NewAccountActivity : AppCompatActivity() {
         //Giving avatar to user
         iviAvatar.setOnClickListener {
             val random = Random()
-            val avatarNumber = random.nextInt(10)
+            val avatarNumber = random.nextInt(9) + 1
             userAvatar = "avatar_$avatarNumber"
 
             val resourceId = resources.getIdentifier(userAvatar, "drawable", packageName)
@@ -80,10 +85,8 @@ class NewAccountActivity : AppCompatActivity() {
                     AuthService.createUser(this, name, email, password, userAvatar, avatarColor) { complete ->
                         if (complete) {
                             Utils.showShortToast(this, "OK")
-                            //we could return to login by an Intent or finishing the activity where we are
-                            /*val loginIntent = Intent(this, LoginActivity::class.java)
-                            startActivity(loginIntent)*/
-                            finish()
+                            val loginIntent = Intent(this, LoginActivity::class.java)
+                            startActivity(loginIntent)
                         } else {
                             Utils.showShortToast(this, "ERROR")
                         }
