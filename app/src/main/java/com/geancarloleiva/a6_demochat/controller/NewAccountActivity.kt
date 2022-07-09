@@ -38,6 +38,7 @@ class NewAccountActivity : AppCompatActivity() {
         lblGoLogin.setOnClickListener {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
+            finish()
         }
 
         //Giving avatar to user
