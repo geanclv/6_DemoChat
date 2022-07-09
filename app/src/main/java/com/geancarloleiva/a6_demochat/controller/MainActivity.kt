@@ -1,5 +1,6 @@
 package com.geancarloleiva.a6_demochat.controller
 
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.navigation.NavigationView
@@ -20,9 +22,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.geancarloleiva.a6_demochat.R
 import com.geancarloleiva.a6_demochat.databinding.ActivityMainBinding
+import com.geancarloleiva.a6_demochat.model.Channel
 import com.geancarloleiva.a6_demochat.service.AuthService
+import com.geancarloleiva.a6_demochat.service.MessageService
 import com.geancarloleiva.a6_demochat.service.UserDataService
 import com.geancarloleiva.a6_demochat.util.BROADCAST_USER_DATA_CHANGE
+import com.geancarloleiva.a6_demochat.util.SOCKET_URL
+import com.geancarloleiva.a6_demochat.util.Utils
+import io.socket.client.IO
+import io.socket.emitter.Emitter
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtName: TextView
     private lateinit var txtEmail: TextView
     private lateinit var btnLogin: Button
+
+    val socket = IO.socket(SOCKET_URL)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //My code
+        Utils.hideKeyboard(this, this)
         iviAvatar = findViewById(R.id.iviAvatar)
         txtName = findViewById(R.id.txtName)
         txtEmail = findViewById(R.id.txtEmail)
@@ -80,14 +91,66 @@ class MainActivity : AppCompatActivity() {
         //Add channel
         val btnAddChannel: Button = findViewById(R.id.btnAddChannel)
         btnAddChannel.setOnClickListener {
+            if(AuthService.isLoggedIn){
+                val builder = AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_add_channel, null)
 
+                builder.setView(dialogView)
+                    .setPositiveButton("Add") { dialogInterface, i ->
+                        val channelName = dialogView.findViewById<EditText>(R.id.txtChannelName)
+                            .text.toString()
+                        val channelDescription = dialogView.findViewById<EditText>(R.id.txtChannelDescription)
+                            .text.toString()
+
+                        //Using sockets to transfer info (API must support it)
+                        socket.emit("newChannel", channelName, channelDescription)
+                    }
+                    .setNegativeButton("Cancel") { dialogInterface, i ->
+                        dialogInterface.dismiss()
+                    }
+                    .show()
+
+                Utils.hideKeyboard(this, this)
+            } else {
+                Utils.showShortToast(this,  "Please log in")
+            }
         }
 
+        socket.connect()
+
+        //When an event is received from API
+        socket.on("channelCreated", onNewChannel)
+    }
+
+    override fun onResume() {
         //Getting info from Broadcast (after user loggin)
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataChangeReceiver,
             IntentFilter(BROADCAST_USER_DATA_CHANGE)
         )
+
+        super.onResume()
+    }
+
+    //Creating a listener for  channels
+    private val onNewChannel = Emitter.Listener { args ->
+        runOnUiThread{
+            val channelName = args[0] as String
+            val channelDescription = args[1] as String
+            val channelId = args[2] as String
+
+            val newChannel = Channel(channelName, channelDescription, channelId)
+            MessageService.lstChannel.add(newChannel)
+        }
+    }
+
+    override fun onDestroy() {
+        socket.disconnect()
+
+        //Unregistering the Broadcast
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
+
+        super.onDestroy()
     }
 
     //complementing the info received from the Broadcast

@@ -26,4 +26,8 @@
 
     <string name="lbl_login">Please create account or login to continue</string>
     <string name="hint_message">Message</string>
+
+    <string name="lbl_add_channel_title">Add channel</string>
+    <string name="lbl_add_channel_name">Channel name</string>
+    <string name="lbl_add_channel_description">Channel description</string>
 </resources>

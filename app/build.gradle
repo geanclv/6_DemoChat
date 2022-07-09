@@ -50,4 +50,10 @@ dependencies {
 
     //HTTP management with Volley
     implementation 'com.android.volley:volley:1.2.0'
+
+    //Socket iO
+    implementation ('io.socket:socket.io-client:2.0.1') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
 }
