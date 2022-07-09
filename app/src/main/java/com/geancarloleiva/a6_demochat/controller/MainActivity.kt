@@ -154,7 +154,6 @@ class MainActivity : AppCompatActivity() {
             MessageService.lstChannel.add(newChannel)
 
             channelAdapter.notifyDataSetChanged()
-
         }
     }
 
