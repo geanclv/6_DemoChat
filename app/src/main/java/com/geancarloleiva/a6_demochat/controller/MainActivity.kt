@@ -7,10 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -42,8 +39,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtName: TextView
     private lateinit var txtEmail: TextView
     private lateinit var btnLogin: Button
+    private lateinit var channelAdapter: ArrayAdapter<Channel>
 
-    val socket = IO.socket(SOCKET_URL)
+    private val socket = IO.socket(SOCKET_URL)
+
+    private fun setupAdapter(){
+        channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
+            MessageService.lstChannel)
+        val lstChanelList: ListView = findViewById(R.id.lstChanelList)
+        lstChanelList.adapter = channelAdapter
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +87,12 @@ class MainActivity : AppCompatActivity() {
                 txtEmail.text = getString(R.string.nav_header_subtitle)
                 iviAvatar.setImageResource(R.mipmap.ic_launcher_round)
                 iviAvatar.setBackgroundColor(Color.TRANSPARENT)
+
+                MessageService.getChannels(this) { complete ->
+                    if(complete){
+                        channelAdapter.notifyDataSetChanged()
+                    }
+                }
             } else {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 startActivity(loginIntent)
@@ -141,6 +152,8 @@ class MainActivity : AppCompatActivity() {
 
             val newChannel = Channel(channelName, channelDescription, channelId)
             MessageService.lstChannel.add(newChannel)
+
+            channelAdapter.notifyDataSetChanged()
         }
     }
 
