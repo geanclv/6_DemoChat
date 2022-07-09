@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Menu
 import android.widget.*
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -23,6 +24,8 @@ import com.geancarloleiva.a6_demochat.model.Channel
 import com.geancarloleiva.a6_demochat.service.AuthService
 import com.geancarloleiva.a6_demochat.service.MessageService
 import com.geancarloleiva.a6_demochat.service.UserDataService
+import com.geancarloleiva.a6_demochat.ui.home.HomeFragment
+import com.geancarloleiva.a6_demochat.util.BROADCAST_CHANNEL_DATA_CHANGE
 import com.geancarloleiva.a6_demochat.util.BROADCAST_USER_DATA_CHANGE
 import com.geancarloleiva.a6_demochat.util.SOCKET_URL
 import com.geancarloleiva.a6_demochat.util.Utils
@@ -40,13 +43,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtEmail: TextView
     private lateinit var btnLogin: Button
     private lateinit var channelAdapter: ArrayAdapter<Channel>
+    private lateinit var lstChanelList: ListView
+    var selectedChannel: Channel? = null
 
     private val socket = IO.socket(SOCKET_URL)
 
     private fun setupAdapter(){
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
             MessageService.lstChannel)
-        val lstChanelList: ListView = findViewById(R.id.lstChanelList)
+        lstChanelList = findViewById(R.id.lstChanelList)
         lstChanelList.adapter = channelAdapter
     }
 
@@ -72,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //My code
+        setupAdapter()
         Utils.hideKeyboard(this, this)
         iviAvatar = findViewById(R.id.iviAvatar)
         txtName = findViewById(R.id.txtName)
@@ -88,9 +94,15 @@ class MainActivity : AppCompatActivity() {
                 iviAvatar.setImageResource(R.mipmap.ic_launcher_round)
                 iviAvatar.setBackgroundColor(Color.TRANSPARENT)
 
-                MessageService.getChannels(this) { complete ->
+                MessageService.getChannels { complete ->
                     if(complete){
-                        channelAdapter.notifyDataSetChanged()
+                        if(MessageService.lstChannel.isNotEmpty()){
+                            selectedChannel = MessageService.lstChannel[0]
+                            channelAdapter.notifyDataSetChanged()
+
+                            //Notifying to the Fragment that a new channel was selected
+                            notifyFragmentChannelChanged()
+                        }
                     }
                 }
             } else {
@@ -127,6 +139,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //Channel list change
+        lstChanelList.setOnItemClickListener{adapterView, view, i, l ->
+            selectedChannel = MessageService.lstChannel[i]
+            notifyFragmentChannelChanged()
+        }
+
+        //Socket events
         socket.connect()
 
         //When an event is received from API
@@ -135,6 +154,13 @@ class MainActivity : AppCompatActivity() {
         if(App.sharedPrefs.isLoggedIn){
             AuthService.findUserByEmail(this){}
         }
+    }
+
+    private fun notifyFragmentChannelChanged(){
+        //Notifying to the Fragment that a new channel was selected
+        val channelChanged = Intent(BROADCAST_CHANNEL_DATA_CHANGE)
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(channelChanged)
     }
 
     override fun onResume() {

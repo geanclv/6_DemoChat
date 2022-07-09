@@ -83,7 +83,7 @@ class NewAccountActivity : AppCompatActivity() {
         if (name.isNotBlank() && name.isNotEmpty()) {
             if (email.isNotBlank() && email.isNotEmpty()) {
                 if (password.isNotBlank() && password.isNotEmpty()) {
-                    AuthService.createUser(this, name, email, password, userAvatar, avatarColor) { complete ->
+                    AuthService.createUser(name, email, password, userAvatar, avatarColor) { complete ->
                         if (complete) {
                             Utils.showShortToast(this, "OK")
                             val loginIntent = Intent(this, LoginActivity::class.java)

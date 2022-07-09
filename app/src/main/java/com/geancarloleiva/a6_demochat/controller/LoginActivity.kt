@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
 
         if(user.isNotEmpty() && user.isNotBlank()){
             if(password.isNotEmpty() && password.isNotBlank()){
-                AuthService.loginUser(this, user, password){complete ->
+                AuthService.loginUser(user, password){complete ->
                     if(complete){
                         Utils.showShortToast(this, "Login OK")
                         //Broadcasting that the user is Logged in

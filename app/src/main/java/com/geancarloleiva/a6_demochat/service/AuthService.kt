@@ -26,7 +26,7 @@ object AuthService {
     //HTTP functions that involve Authorization
     fun exampleResponseString(
         //this fun is only as example when you have a String Response. No valid for this app/operation
-        context: Context, name: String, complete: (Boolean) -> Unit
+        name: String, complete: (Boolean) -> Unit
     ) {
         val url = USER_CREATE
 
@@ -55,7 +55,7 @@ object AuthService {
     }
 
     fun createUser(
-        context: Context, name: String, email: String, password: String,
+        name: String, email: String, password: String,
         avatarName: String, avatarColor: String, complete: (Boolean) -> Unit
     ) {
         val url = USER_CREATE
@@ -106,7 +106,7 @@ object AuthService {
         App.sharedPrefs.requestQueue.add(createRequest)
     }
 
-    fun loginUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
+    fun loginUser(email: String, password: String, complete: (Boolean) -> Unit) {
         val jsonBody = JSONObject()
         jsonBody.put("email", email)
         jsonBody.put("password", password)
