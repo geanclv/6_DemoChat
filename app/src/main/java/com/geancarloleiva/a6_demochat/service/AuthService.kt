@@ -1,13 +1,17 @@
 package com.geancarloleiva.a6_demochat.service
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.geancarloleiva.a6_demochat.util.BROADCAST_USER_DATA_CHANGE
 import com.geancarloleiva.a6_demochat.util.USER_CREATE
+import com.geancarloleiva.a6_demochat.util.USER_GET_INFO
 import com.geancarloleiva.a6_demochat.util.USER_LOGIN
 import org.json.JSONObject
 
@@ -107,7 +111,7 @@ object AuthService {
         val loginRequest = object : JsonObjectRequest(Method.POST, USER_LOGIN, null,
             Response.Listener { response ->
                 try {
-                    if(response.getBoolean("completed")) {
+                    if (response.getBoolean("completed")) {
                         authToken = "fakeToken"
                         UserDataService.id = response.getString("id")
                         UserDataService.name = response.getString("name")
@@ -137,5 +141,39 @@ object AuthService {
         }
 
         Volley.newRequestQueue(context).add(loginRequest)
+    }
+
+    fun findUserByEmail(context: Context, complete: (Boolean) -> Unit) {
+        val findUserByEmail = object : JsonObjectRequest(Method.GET, "$USER_GET_INFO$userEmail",
+            null, Response.Listener { response ->
+                try {
+                    if (response.getBoolean("completed")) {
+                        UserDataService.id = response.getString("id")
+                        UserDataService.name = response.getString("name")
+                        UserDataService.email = response.getString("email")
+                        UserDataService.avatarName = response.getString("avatarName")
+                        UserDataService.avatarColor = response.getString("avatarColor")
+
+                        var dataUserChange = Intent(BROADCAST_USER_DATA_CHANGE)
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(dataUserChange)
+
+                        complete(true)
+                    } else {
+                        complete(false)
+                    }
+                } catch (e: Exception) {
+                    Log.d("ERROR", e.localizedMessage)
+                    complete(false)
+                }
+            }, Response.ErrorListener { error ->
+                Log.d("ERROR", "Could not connect to service: $error")
+                complete(false)
+            }) {
+            override fun getBodyContentType(): String {
+                return "application/json; charset=utf-8"
+            }
+        }
+
+        Volley.newRequestQueue(context).add(findUserByEmail)
     }
 }
