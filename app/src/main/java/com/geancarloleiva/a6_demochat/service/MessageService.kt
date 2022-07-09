@@ -7,11 +7,13 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
 import com.geancarloleiva.a6_demochat.controller.App
 import com.geancarloleiva.a6_demochat.model.Channel
+import com.geancarloleiva.a6_demochat.model.Message
 import com.geancarloleiva.a6_demochat.util.CHANNEL_GET_ALL
 
 object MessageService {
 
     val lstChannel = ArrayList<Channel>()
+    val lstMessage = ArrayList<Message>()
 
     fun getChannels(complete: (Boolean) -> Unit) {
         val channelRequest = object : JsonArrayRequest(Method.GET, CHANNEL_GET_ALL, null,
