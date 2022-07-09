@@ -33,7 +33,6 @@ object MessageService {
                     if (!haveData) {
                         complete(false)
                     }
-
                 }catch (e: Exception){
                     Log.e("ERROR", e.localizedMessage)
                     complete(false)
