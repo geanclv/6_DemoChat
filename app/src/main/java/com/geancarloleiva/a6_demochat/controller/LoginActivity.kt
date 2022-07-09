@@ -40,11 +40,13 @@ class LoginActivity : AppCompatActivity() {
         btnLogin.setOnClickListener{
             login()
         }
+
+        progressBarVisible(false)
     }
 
     private fun login(){
         progressBarVisible(true)
-        hideKeyboard()
+        Utils.hideKeyboard(this, this)
         val user = findViewById<EditText>(R.id.txtUser).text.toString()
         val password = findViewById<EditText>(R.id.txtPassword).text.toString()
 
@@ -78,12 +80,5 @@ class LoginActivity : AppCompatActivity() {
         }
         btnSignin.isEnabled = !enable
         btnLogin.isEnabled = !enable
-    }
-
-    private fun hideKeyboard(){
-        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if(inputManager.isAcceptingText){
-            inputManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
-        }
     }
 }
