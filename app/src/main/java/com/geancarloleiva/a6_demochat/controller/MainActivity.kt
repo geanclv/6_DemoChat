@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         //Go to login
         btnLogin.setOnClickListener {
-            if (AuthService.isLoggedIn) {
+            if (App.sharedPrefs.isLoggedIn) {
                 UserDataService.logout()
                 btnLogin.text = getString(R.string.btn_login)
                 txtName.text = getString(R.string.nav_header_title)
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         //Add channel
         val btnAddChannel: Button = findViewById(R.id.btnAddChannel)
         btnAddChannel.setOnClickListener {
-            if(AuthService.isLoggedIn){
+            if(App.sharedPrefs.isLoggedIn){
                 val builder = AlertDialog.Builder(this)
                 val dialogView = layoutInflater.inflate(R.layout.dialog_add_channel, null)
 
@@ -131,6 +131,10 @@ class MainActivity : AppCompatActivity() {
 
         //When an event is received from API
         socket.on("channelCreated", onNewChannel)
+
+        if(App.sharedPrefs.isLoggedIn){
+            AuthService.findUserByEmail(this){}
+        }
     }
 
     override fun onResume() {
@@ -169,7 +173,7 @@ class MainActivity : AppCompatActivity() {
     //complementing the info received from the Broadcast
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (AuthService.isLoggedIn) {
+            if (App.sharedPrefs.isLoggedIn) {
                 txtName.text = UserDataService.name
                 txtEmail.text = UserDataService.email
                 val resourceId = resources.getIdentifier(

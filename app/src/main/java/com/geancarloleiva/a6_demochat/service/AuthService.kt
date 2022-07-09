@@ -9,6 +9,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.geancarloleiva.a6_demochat.controller.App
 import com.geancarloleiva.a6_demochat.util.BROADCAST_USER_DATA_CHANGE
 import com.geancarloleiva.a6_demochat.util.USER_CREATE
 import com.geancarloleiva.a6_demochat.util.USER_GET_INFO
@@ -17,9 +18,10 @@ import org.json.JSONObject
 
 object AuthService {
 
-    var isLoggedIn = false
+    //Replacing this attr by SharedPrefs data
+    /*var isLoggedIn = false
     var userEmail = ""
-    var authToken = ""
+    var authToken = ""*/
 
     //HTTP functions that involve Authorization
     fun exampleResponseString(
@@ -48,7 +50,8 @@ object AuthService {
             }
         }
 
-        Volley.newRequestQueue(context).add(request)
+        //Having an unique queue
+        App.sharedPrefs.requestQueue.add(request)
     }
 
     fun createUser(
@@ -99,7 +102,8 @@ object AuthService {
             }*/
         }
 
-        Volley.newRequestQueue(context).add(createRequest)
+        //Having an unique queue
+        App.sharedPrefs.requestQueue.add(createRequest)
     }
 
     fun loginUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
@@ -112,13 +116,13 @@ object AuthService {
             Response.Listener { response ->
                 try {
                     if (response.getBoolean("completed")) {
-                        authToken = "fakeToken"
+                        App.sharedPrefs.authToken = "fakeToken"
                         UserDataService.id = response.getString("id")
                         UserDataService.name = response.getString("name")
                         UserDataService.email = response.getString("email")
                         UserDataService.avatarName = response.getString("avatarName")
                         UserDataService.avatarColor = response.getString("avatarColor")
-                        isLoggedIn = true
+                        App.sharedPrefs.isLoggedIn = true
                         complete(true)
                     } else {
                         complete(false)
@@ -140,12 +144,13 @@ object AuthService {
             }
         }
 
-        Volley.newRequestQueue(context).add(loginRequest)
+        //Having an unique queue
+        App.sharedPrefs.requestQueue.add(loginRequest)
     }
 
     fun findUserByEmail(context: Context, complete: (Boolean) -> Unit) {
-        val findUserByEmail = object : JsonObjectRequest(Method.GET, "$USER_GET_INFO$userEmail",
-            null, Response.Listener { response ->
+        val findUserByEmail = object : JsonObjectRequest(Method.GET,
+            "$USER_GET_INFO${App.sharedPrefs.userEmail}", null, Response.Listener { response ->
                 try {
                     if (response.getBoolean("completed")) {
                         UserDataService.id = response.getString("id")
@@ -174,6 +179,7 @@ object AuthService {
             }
         }
 
-        Volley.newRequestQueue(context).add(findUserByEmail)
+        //Having an unique queue
+        App.sharedPrefs.requestQueue.add(findUserByEmail)
     }
 }

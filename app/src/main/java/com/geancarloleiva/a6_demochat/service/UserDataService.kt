@@ -1,6 +1,7 @@
 package com.geancarloleiva.a6_demochat.service
 
 import android.graphics.Color
+import com.geancarloleiva.a6_demochat.controller.App
 import java.util.*
 
 object UserDataService {
@@ -37,8 +38,8 @@ object UserDataService {
         email = ""
         avatarName = ""
         avatarColor = ""
-        AuthService.authToken = ""
-        AuthService.userEmail = ""
-        AuthService.isLoggedIn = false
+        App.sharedPrefs.authToken = ""
+        App.sharedPrefs.userEmail = ""
+        App.sharedPrefs.isLoggedIn = false
     }
 }

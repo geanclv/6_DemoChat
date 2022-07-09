@@ -5,6 +5,7 @@ import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.geancarloleiva.a6_demochat.controller.App
 import com.geancarloleiva.a6_demochat.model.Channel
 import com.geancarloleiva.a6_demochat.util.CHANNEL_GET_ALL
 
@@ -47,11 +48,12 @@ object MessageService {
 
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
-                headers.put("Authorization", "Bearer ${AuthService.authToken}")
+                headers.put("Authorization", "Bearer ${App.sharedPrefs.authToken}")
                 return headers
             }
         }
 
-        Volley.newRequestQueue(context).add(channelRequest)
+        //Having an unique queue
+        App.sharedPrefs.requestQueue.add(channelRequest)
     }
 }
