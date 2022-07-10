@@ -48,9 +48,11 @@ class MainActivity : AppCompatActivity() {
 
     private val socket = IO.socket(SOCKET_URL)
 
-    private fun setupAdapter(){
-        channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
-            MessageService.lstChannel)
+    private fun setupAdapter() {
+        channelAdapter = ArrayAdapter(
+            this, android.R.layout.simple_list_item_1,
+            MessageService.lstChannel
+        )
         lstChanelList = findViewById(R.id.lstChanelList)
         lstChanelList.adapter = channelAdapter
     }
@@ -95,8 +97,8 @@ class MainActivity : AppCompatActivity() {
                 iviAvatar.setBackgroundColor(Color.TRANSPARENT)
 
                 MessageService.getChannels { complete ->
-                    if(complete){
-                        if(MessageService.lstChannel.isNotEmpty()){
+                    if (complete) {
+                        if (MessageService.lstChannel.isNotEmpty()) {
                             selectedChannel = MessageService.lstChannel[0]
                             channelAdapter.notifyDataSetChanged()
 
@@ -114,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         //Add channel
         val btnAddChannel: Button = findViewById(R.id.btnAddChannel)
         btnAddChannel.setOnClickListener {
-            if(App.sharedPrefs.isLoggedIn){
+            if (App.sharedPrefs.isLoggedIn) {
                 val builder = AlertDialog.Builder(this)
                 val dialogView = layoutInflater.inflate(R.layout.dialog_add_channel, null)
 
@@ -122,8 +124,9 @@ class MainActivity : AppCompatActivity() {
                     .setPositiveButton("Add") { dialogInterface, i ->
                         val channelName = dialogView.findViewById<EditText>(R.id.txtChannelName)
                             .text.toString()
-                        val channelDescription = dialogView.findViewById<EditText>(R.id.txtChannelDescription)
-                            .text.toString()
+                        val channelDescription =
+                            dialogView.findViewById<EditText>(R.id.txtChannelDescription)
+                                .text.toString()
 
                         //Using sockets to transfer info (API must support it)
                         socket.emit("newChannel", channelName, channelDescription)
@@ -135,12 +138,12 @@ class MainActivity : AppCompatActivity() {
 
                 Utils.hideKeyboard(this, this)
             } else {
-                Utils.showShortToast(this,  "Please log in")
+                Utils.showShortToast(this, "Please log in")
             }
         }
 
         //Channel list change
-        lstChanelList.setOnItemClickListener{adapterView, view, i, l ->
+        lstChanelList.setOnItemClickListener { adapterView, view, i, l ->
             selectedChannel = MessageService.lstChannel[i]
             notifyFragmentChannelChanged()
         }
@@ -151,12 +154,12 @@ class MainActivity : AppCompatActivity() {
         //When an event is received from API
         socket.on("channelCreated", onNewChannel)
 
-        if(App.sharedPrefs.isLoggedIn){
-            AuthService.findUserByEmail(this){}
+        if (App.sharedPrefs.isLoggedIn) {
+            AuthService.findUserByEmail(this) {}
         }
     }
 
-    private fun notifyFragmentChannelChanged(){
+    private fun notifyFragmentChannelChanged() {
         //Notifying to the Fragment that a new channel was selected
         val channelChanged = Intent(BROADCAST_CHANNEL_DATA_CHANGE)
         LocalBroadcastManager.getInstance(this)
@@ -175,15 +178,19 @@ class MainActivity : AppCompatActivity() {
 
     //Creating a listener for  channels
     private val onNewChannel = Emitter.Listener { args ->
-        runOnUiThread{
-            val channelName = args[0] as String
-            val channelDescription = args[1] as String
-            val channelId = args[2] as String
+        if (App.sharedPrefs.isLoggedIn) {
+            runOnUiThread {
+                val channelName = args[0] as String
+                val channelDescription = args[1] as String
+                val channelId = args[2] as String
 
-            val newChannel = Channel(channelName, channelDescription, channelId)
-            MessageService.lstChannel.add(newChannel)
+                val newChannel = Channel(channelName, channelDescription, channelId)
+                MessageService.lstChannel.add(newChannel)
 
-            channelAdapter.notifyDataSetChanged()
+                channelAdapter.notifyDataSetChanged()
+            }
+        } else {
+            Utils.showShortToast(this, "You must be logged in")
         }
     }
 
